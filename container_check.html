@@ -1,0 +1,157 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible"> 
+</head>
+<title>Container check</title>
+
+<body> 
+<div align="center"> 
+
+<script language="javascript">
+//去除字符串的空格
+function gf_trim(as_string)
+{
+   while(as_string.length > 0 && as_string.indexOf(" ")==0) as_string = as_string.substr(1);
+   while(as_string.length > 0 && as_string.lastIndexOf(" ")==(as_string.length-1)) as_string = as_string.substr(0,as_string.length-1);
+   return as_string;
+}
+//集装箱箱号验证
+//功能：验证集装箱箱号：
+//参数：
+//   as_cntrno 是否符合国际标准，
+//返回值：True 符合国际标准或强行通过(特殊箱号)
+//举例：gf_chkcntrno( 'TEXU2982987', 0 )     
+function chkcntrno(as_cntrno,ai_choice)
+{
+ var fi_ki;
+ var fi_numsum;
+ var fi_nummod;
+ var fai_num = new Array(11);
+ var fb_errcntrno=false;
+
+ if (as_cntrno==null) return true; //null不进行验证
+ if (gf_trim(as_cntrno)=="") return true; //空不进行验证
+ as_cntrno = gf_trim(as_cntrno);
+ 
+ if (as_cntrno.length == 11)   //国际标准为11位，最后一位是校验位，若不是11位肯定不是标准箱
+ { for(fi_ki=1;fi_ki<=11;fi_ki++)
+   fai_num[fi_ki] = 0;
+  for(fi_ki=1;fi_ki<=4;fi_ki++)     //根据国际标准验证法则处理箱号前面的4个英文字母
+  {
+   fch_char=as_cntrno.charAt(fi_ki-1).toUpperCase();
+   switch(true)
+   { case (fch_char=="A"):{fai_num[fi_ki] = 10;break;}
+    case (fch_char>="V" && fch_char<="Z"):{fai_num[fi_ki] = fch_char.charCodeAt() - 52;break;}
+    case (fch_char>="L" && fch_char<="U"):{fai_num[fi_ki] = fch_char.charCodeAt() - 53;break;}
+    default:{fai_num[fi_ki] = fch_char.charCodeAt() - 54;break;}
+   }
+  }
+  for(fi_ki=5;fi_ki<=11;fi_ki++)
+  {  fch_char=as_cntrno.charAt(fi_ki-1);
+   fai_num[fi_ki] = parseInt(fch_char); //ctype((mid(as_cntrno, fi_ki, 1)), integer)
+      }
+  fi_numsum = 0
+  
+  for(fi_ki=1;fi_ki<=10;fi_ki++)
+  { 
+   fi_sqr = 1;
+   for(i=1;i<fi_ki;i++){fi_sqr *=2;}
+   fi_numsum += fai_num[fi_ki] * fi_sqr;
+  }
+
+  if (as_cntrno.substr(0,4) == "HLCU") fi_numsum = fi_numsum - 2; //hapaq lloyd的柜号与国际标准相差2
+  fi_nummod = fi_numsum % 11;
+  if (fi_nummod == 10) fi_nummod = 0;
+  if (fi_nummod == fai_num[11]) fb_errcntrno = true;
+  return fb_errcntrno;
+ }else{
+    return fb_errcntrno;
+ }  
+} 
+
+function docheck(){
+	text = document.getElementById("txt").value;
+	text =  text.split("\n").join(","); //alert(text);
+	text =  text.split(","); //alert(text);
+	for (i in text) { 
+		str = text[i];
+		str = str.replace(/[ ]/g,"");
+		str = str.replace(/[\r\n]/g,"");
+				 if (chkcntrno(str ,0)){				
+				    document.getElementById("tc").value = document.getElementById("tc").value + "\r" + str;					
+				 }else{					
+				 	document.getElementById("tf").value = document.getElementById("tf").value + "\r" + str;
+				 }	
+	}			 
+}
+
+
+</script>
+
+<table><tr>
+	<td align="left">
+  <span style="font-size:18px">Enter the 11-digit container number:</span> <br>
+  <span style="font-size:12px;color:red;">  
+  (Support batch input)
+   </span>
+	</td>
+	<td style="width:20px;">
+	</td>
+	<td>
+   <textarea rows="5" cols="26" name="txt" type="text" id="txt" ></textarea>
+	</td>
+	<td style="width:20px;">
+	</td><td>
+ <input style="font-size:18px" name="" type="button" value="Check" onclick="docheck();">
+ <br><span style="font-size:12px;color:red;">  
+   (One container number in a row) </span>
+ </td></tr>
+ </table>
+ 
+<br />
+ 
+ <table  style="width:1000px;" border="0" style="font-size:24px">
+  <tr>
+	<td valign="top" align="left" style="width:250px;">
+	
+	 
+
+	</td>
+    <td valign="top">Correct:<br />
+<textarea name="textarea" rows="15" id="tc" name="tc" style="font-size:24px" ></textarea></td>
+ <td>
+</td>
+    <td valign="top">Wrong:<br /><textarea name="textarea2" rows="15" id="tf" name="tf" style="font-size:24px"></textarea></td>
+   <td valign="top" align="right" style="width:250px;">
+   
+		 
+
+   </td>
+  </tr>
+</table> 
+</div>
+
+ 
+<br /><br />
+<br />
+ 
+<style type="text/css">
+    .footer{height: 60px;width: 100%;background-color: #1b2736;}
+    .footer .fl{float:left;}
+    .footer .fr{float:right;}
+    .footer .middle{width: 1000px;margin: 0 auto;height: 60px;}
+    .footer .middle .logo{width: 158px;height:50px;background: url("/images/foblogo.png") no-repeat center;}
+    .footer .middle .link-content{width: auto;overflow: hidden;margin-top: 30px;margin-left: 10px;}
+    .footer .middle .link-content li{text-decoration: none;list-style: none;border-left: 1px solid #fff;width: 80px;float: left;text-align: center;height: 20px;line-height: 20px;}
+    .footer .middle .link-content li a{text-decoration: none;color: #fff;font-size: 14px;}
+    .footer .middle .txt{height: 60px;line-height: 23px;font-size: 12px;width: 480px;text-align: center;color: #fff;padding: 4px 0;}
+    .footer .middle .txt a{color: #fff;}
+</style>
+
+<div style="display:none">
+</div></body>
+</html>
