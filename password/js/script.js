@@ -108,7 +108,7 @@ generateBtn.addEventListener("click", () => {
     copiedInfo.style.transform = "translateY(200%)";
     copiedInfo.style.opacity = "0";
     // 自动复制密码到剪切板
-    copyBtn.click();
+    //copyBtn.click();
 });
 
 // 负责生成密码并返回密码的函数。
